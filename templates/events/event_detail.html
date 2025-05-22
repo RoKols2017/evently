@@ -1,0 +1,33 @@
+<!-- templates/events/event_detail.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{ event.title }}</h1>
+
+<p><strong>Дата:</strong> {{ event.event_date }} в {{ event.start_time }}</p>
+<p><strong>Место:</strong> {{ event.location }} ({{ event.city }})</p>
+<p><strong>Жанр:</strong> {{ event.genre }}</p>
+<p><strong>Цена:</strong> {{ event.ticket_price }} ₽</p>
+<p><strong>Билетов осталось:</strong> {{ event.available_tickets }}</p>
+
+{% if event.rules %}
+    <p><strong>Правила:</strong></p>
+    <div>{{ event.rules|safe }}</div>
+{% endif %}
+{% if event.event_url %}
+    <p><a href="{{ event.event_url }}" target="_blank">Страница мероприятия</a></p>
+{% endif %}
+
+{% if user.is_authenticated %}
+    <form action="{% url 'booking:book_event' event.id %}" method="post">
+        {% csrf_token %}
+        <label for="ticket_count">Количество билетов:</label>
+        <input type="number" name="ticket_count" id="ticket_count" min="1" max="{{ event.available_tickets }}" value="1" required>
+        <button type="submit" class="btn btn-success">Забронировать</button>
+    </form>
+{% else %}
+    <p><a href="{% url 'login' %}?next={% url 'events:event_detail' event.id %}">Войдите</a>, чтобы забронировать билет.</p>
+{% endif %}
+
+<a href="{% url 'events:event_list' %}">← Назад к списку</a>
+{% endblock %}

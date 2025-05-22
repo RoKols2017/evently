@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Афиша мероприятий{% endblock %}
+
+{% block content %}
+<form method="get" class="filter-form mb-4">
+    <label>Дата с:</label>
+    <input type="date" name="date_from" value="{{ filters.date_from }}"/>
+
+    <label>по:</label>
+    <input type="date" name="date_to" value="{{ filters.date_to }}"/>
+
+    <label>Жанр:</label>
+    <select name="genre">
+        <option value="">Все</option>
+        {% for g in genres %}
+            <option value="{{ g.name }}" {% if filters.genre == g.name %}selected{% endif %}>{{ g.name }}</option>
+        {% endfor %}
+    </select>
+
+    <label>Город:</label>
+    <select name="city">
+        <option value="">Все</option>
+        {% for c in cities %}
+            <option value="{{ c.name }}" {% if filters.city == c.name %}selected{% endif %}>{{ c.name }}</option>
+        {% endfor %}
+    </select>
+
+    <button type="submit" class="btn btn-primary">Применить</button>
+</form>
+
+{% if events %}
+    <ul class="list-group">
+    {% for event in events %}
+        <li class="list-group-item mb-2">
+            <a href="{% url 'events:event_detail' event.pk %}"><strong>{{ event.title }}</strong></a><br>
+            <span>{{ event.event_date }} | {{ event.city }} | {{ event.genre }}</span><br>
+            <span>Цена: {{ event.ticket_price }} ₽</span> | <span>Осталось: {{ event.available_tickets }}</span>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Нет мероприятий по выбранным фильтрам.</p>
+{% endif %}
+{% endblock %}
